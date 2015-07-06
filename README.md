@@ -31,6 +31,9 @@ print g.integrate_all()
 
 #plot it to make sure it looks good
 g.plot_2d('my_bias.png')
+
+#write it to be ready for plumed2
+g.write_plumed2_grid('plumed_2.dat')
 ```
 
 The Grid Object
