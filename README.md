@@ -87,7 +87,7 @@ probability.
 Regions
 ----
 
-1```python
+```python
 
 #Continuing the example from above:
 
