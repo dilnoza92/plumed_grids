@@ -16,6 +16,8 @@ Quickstart
 ----
 
 ```python
+from plumed_grids import *
+
 #create empty grid
 g = Grid()
 
