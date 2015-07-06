@@ -12,7 +12,7 @@ It does some nice things, but doesn't work with derivatives and does
 not do spline interpolation.
 
 
-Usage
+Quickstart
 ----
 
 ```python
@@ -31,6 +31,43 @@ print g.integrate_all()
 
 #plot it to make sure it looks good
 g.plot_2d('my_bias.png')
+```
+
+The Grid Object
+---
+
+```python
+
+
+g = Grid()
+
+#Create grid by adding CVs. The name doesn't matter so much, but was tracked in PLUMED1 (not PLUMED2)
+#After name comes min, max, nbins, and periodicity
+g.add_cv('Absolute position', -155, 155, 1024, False)
+g.add_cv('Absolute position', -155, 155, 1024, False)
+
+#add some values to bias using an image
+g.add_png_to_grid('test.png')
+
+#see a summary 
+print g
+
+#see individual attributes
+print g.nbins
+print g.dims
+print g.dx
+print g.ncv
+
+
+#Write/Read
+g.write_plumed1_grid('test_1.dat')
+g2 = Grid()
+g2.read_plumed1_grid('test_1.dat')
+
+#uses fuzzy floating point to test equality
+#useful for testing (perhaps one day for unit tests of PLUMED/PLUMED2)
+print g == g2
+
 ```
 
 Integrals
