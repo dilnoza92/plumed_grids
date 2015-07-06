@@ -1,4 +1,4 @@
-from math import ceil, floor, log, exp, pi
+from math import ceil, floor, log, exp, pi, copysign
 import numpy as np
 from scipy.integrate import simps
 import copy
@@ -189,7 +189,7 @@ class Grid(object):
         #I'll ignore the force for now
         with open(filename, 'r') as f:
 
-            toset = 1000
+            toset = 9999
             toskip = 0
             
             while True:                
@@ -745,27 +745,37 @@ class Grid(object):
         self._enumerate_grid(lambda x: self._print_grid(x, output))
 
     def write_plumed2_grid(self, output, names=None):
+        """
+        Pass in CV names + label for pot if you'd like, otherwise generic labels/names/fields are generated
+        """
         if(type(output) == type("")):
             output = open(output, 'w')
         if(names is not None):
             if(len(names) == 1):
                 names = [names for x in xrange(self.dims)]
-            elif(len(names) != self.dims):
-                raise ValueError('Length of given names does not match dimensions')
+            elif(len(names) != self.dims + 1):
+                raise ValueError('Length of given names does not match dimensions + 1 label for variable')
         else:
             try:
                 names = self.names
             except AttributeError:
-                names = ['cv_{}' for i in xrange(self.dims)]
+                names = ['cv_{}'.format(i) for i in xrange(self.dims)]
+                names.append('@label')
                 
         output.write('#! FIELDS ')
         for n in names:
             output.write('{} '.format(n))
         output.write('\n')
 
-        for i,n in enumerate(names):
-            output.write('#! SET min_{} {}\n'.format(n, self.min[i]))
-            output.write('#! SET max_{} {}\n'.format(n, self.max[i]))
+        for i,n in enumerate(names[:-1]):
+            if(np.isclose(abs(self.min[i]), pi)):
+                output.write('#! SET min_{} {}pi\n'.format(n, '' if self.min[i] > 0 else '-', 'pi'))
+            else:
+                output.write('#! SET min_{} {}\n'.format(n, self.min[i]))
+            if(np.isclose(abs(self.max[i]), pi)):
+                output.write('#! SET max_{} {}pi\n'.format(n, '' if self.max[i] > 0 else '-', 'pi'))
+            else:
+                output.write('#! SET max_{} {}\n'.format(n, self.max[i]))
             output.write('#! SET nbins_{} {}\n'.format(n, self.nbins[i]))
             output.write('#! SET periodic_{} {}\n'.format(n, 'true' if self.periodic[i] else 'false'))
         

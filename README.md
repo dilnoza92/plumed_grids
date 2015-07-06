@@ -35,7 +35,7 @@ print g.integrate_all()
 g.plot_2d('my_bias.png')
 
 #write it to be ready for plumed2
-g.write_plumed2_grid('plumed_2.dat')
+g.write_plumed2_grid('plumed_2.dat', names=['phi', 'psi', 'pot.target'])
 ```
 
 The Grid Object
@@ -87,7 +87,7 @@ probability.
 Regions
 ----
 
-```python
+1```python
 
 #Continuing the example from above:
 
@@ -192,3 +192,4 @@ This was created for helping in the experiment directed targeted
 metadynamics work. Please cite:
 
 **Designing Free Energy Surfaces that Match Experimental Data with Metadynamics**. AD White, JF Dama, GA Voth. *J. Chem. Theory Comput.* **2015**, *11 (6)*, pp 2451-2460
+
