@@ -54,6 +54,7 @@ class Grid(object):
         self._clear()
 
     def _clear(self):
+        """Clear everything in in grid"""
         self.min = []
         self.max = []
         self.types = []
@@ -64,6 +65,8 @@ class Grid(object):
 
 
     def clone(self):
+        """Make a deep copy of the grid
+        """
         g = Grid()
         g.min = copy.copy(self.min)
         g.max = copy.copy(self.max)
@@ -457,6 +460,9 @@ class Grid(object):
 
 
     def add_value(self, x, v):
+        """
+        Add the value v at point x to the grid
+        """
         if(len(x) != self.ncv):
             raise ValueError("Dimension of given x vector does not match grid dimension!")
         index = [0 for xi in x]
@@ -467,6 +473,9 @@ class Grid(object):
         self.pot[tuple(index)] += v
 
     def set_value(self, x, v):
+        """
+        Set the value of the grid at point x to v
+        """
         if(len(x) != self.ncv):
             raise ValueError("Dimension of given x vector does not match grid dimension!")
         index = [0 for xi in x]
@@ -479,6 +488,9 @@ class Grid(object):
         self.pot[tuple(index)] = v
 
     def get_value(self, x):
+        """
+        Get the value at point x
+        """
         if(len(x) != self.ncv):
             raise ValueError("Dimension of given x vector does not match grid dimension!")
         index = [0 for xi in x]
@@ -492,6 +504,8 @@ class Grid(object):
 
 
     def add(self, other_grid):
+        """Add another grid. In place, does not copy
+        """
         if(np.shape(self.pot) == np.shape(other_grid.pot)):
             if(self.min == other_grid.min):
                 if(self.max == other_grid.max):
@@ -513,6 +527,9 @@ class Grid(object):
         return array_copy
 
     def set_bin_number(self, new_shape, mode='constant'):
+        """
+        Set bin number. Mode is passed to scipy.ndimage.interpolation.zoom, so read on that for info.  
+        """
 
         if(type(new_shape) == int):
             new_shape = (new_shape,)
@@ -534,6 +551,7 @@ class Grid(object):
         """
         Change the number of grid points using a spline
         interpolation. Intended more for zooming on a grid than expanding.
+        Mode is passed to scipy.ndimage.interpolation.zoom, so read on that for info.  
         """
         if(type(new_shape) == int):
             new_shape = (new_shape)
@@ -582,13 +600,20 @@ class Grid(object):
         output.write('{: 10.8f}\n'.format(self.pot[tuple(indices)]))
 
     def plot_2d(self, filename, cmap='jet', resolution=None, axis=(1,0), hold=False, vrange=None):
+        """This will make a 2D heatmap. The resolution keyword is the bin
+        number on the grid. Set the axis being plotted with the axis
+        keyword. Hold can be used if you want to add other elements to
+        the plot. vrange is the maximum/minimum in the heat map;
+        useful for compaing images side-by-side.
+
+        """
         assert self.dims >= 2
         import matplotlib.pyplot as plt
         old_bins = self.nbins
         if(self.dims > 2):
             #integreate along non-plotting axis
-#            raise NotImplementedError()
-            data = self.pot[:,:,self.nbins[2] / 2]
+            raise NotImplementedError('Not sure how to plot this. Perhaps you should integrate out a dimension first')
+            #data = self.pot[:,:,self.nbins[2] / 2]
         else:
             data = self.pot
         if(resolution is not None):
@@ -609,7 +634,12 @@ class Grid(object):
         if(not hold):
             plt.savefig(filename)
 
-    def bias_to_pmf(self, target_filename, bias_factor, boltzmann_factor):
+    def bias_to_pmf(self, target_filename=None, bias_factor=None, boltzmann_factor=1):
+        """This is used to estimate the PMF from an experiment directed
+        metadynamics run (EDM) or metadynamics run. The
+        target_filename is the bias target (or None) from EDM. Please
+        read this code before using
+        """
         if(bias_factor is not None):
             self.pot *= (bias_factor) / (bias_factor - 1)
         if(target_filename is not None):
@@ -622,6 +652,9 @@ class Grid(object):
         
 
     def plot_2d_region(self, filename, *region_functions):
+        """
+        This will plot, with less options than plot_2d, to check if the regions are in the correct spot.
+        """
         assert self.dims >= 2
         assert NDITER, "numpy nditer unavailable"
         cmap = 'jet'
@@ -684,7 +717,7 @@ class Grid(object):
         for g in grids:
             Z = simps(Z,g)
         
-        return -np.log(Z)
+        return Z
 
         
 

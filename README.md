@@ -78,8 +78,10 @@ print g == g2
 Integrals
 ---
 
-It is always assume that what is stored in the grid is -ln U, so that
-to integrate we take e^(-U) of the values stored.
+It is always assumed that what is stored in the grid is -ln U, so that
+to integrate we take e^(-U) of the values stored and then return -log
+of that integral. So, if units are in energy in kT, we integrate the
+probability.
 
 
 Regions
@@ -106,8 +108,8 @@ region2 = lambda x: ellipse_region(x, [-2,4], [2.5, 5])
 g.plot_2d_region('region1.png', region1)
 g.plot_2d_region('region2.png', region2)
 
-#get integrated difference between them
-g.integrate_region(region1) - g.integrate_region(region2)
+#get free energy difference between them
+-np.log(g.integrate_region(region1)) + np.log(g.integrate_region(region2))
 ```
 
 PLUMED 1 vs PLUMED 2
