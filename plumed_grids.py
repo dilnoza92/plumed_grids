@@ -111,6 +111,29 @@ class Grid(object):
             self.pot[tuple(indexs)] = x[-1]
         self.set_grid_point_number(old_grid_points)
 
+    def read_plumed_grid(self, filename):
+        '''
+        Guesses format (plumed1/plumed2) and dispatches to correct method
+        '''
+
+        if(type(filename) != type('')):
+            raise ValueError('Please pass a filename (string)')
+
+        plumed1 = False
+        with open(filename, 'r') as f:
+            line = f.readline()
+            while(line.find('#!') == -1):
+                line = f.readline()
+            if(line.find('FIELDS') == -1):
+                plumed1 = True
+        if(plumed1):
+            self.read_plumed1_grid(filename)
+        else:
+            self.read_plumed2_grid(filename)
+                    
+            
+        
+
 
     def read_plumed1_grid(self, filename):
 
@@ -206,11 +229,10 @@ class Grid(object):
                             toskip += 1
                         else:
                             assert toskip == 0, "Order of fields is unexpected"
-                            if(not item.startswith('@')):
-                                self.names.append(item)
-                            else:
-                                print 'Reading in variable called {}'.format(item)
-                                                                    
+                            self.names.append(item)
+                    #pop the last name, which is the name of the variable being measured
+                    print 'Reading in variable called {}'.format(self.names.pop())
+                    #self.names.pop()
                     ncv = len(self.names)
                     toset = ncv * 4
                     bins = [0 for i in xrange(ncv)]
@@ -219,7 +241,7 @@ class Grid(object):
                     self.periodic = [0 for i in xrange(ncv)]
                     self.types = [0 for i in xrange(ncv)]
                     continue
-                    
+                assert hasattr(self, 'names'), 'Was not able to parse names from plumed2 grid {}'.format(f.name)
                 #set attributes
                 i,value = get_attr(self.names, 'min', line)
                 if(i != -1):
@@ -644,7 +666,7 @@ class Grid(object):
             self.pot *= (bias_factor) / (bias_factor - 1)
         if(target_filename is not None):
             t = Grid()
-            t.read_plumed1_grid(target_filename)
+            t.read_plumed_grid(target_filename)
             t.pot *= boltzmann_factor
             self.add(t)
         self.pot -= np.min(self.pot)
