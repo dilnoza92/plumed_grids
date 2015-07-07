@@ -22,7 +22,7 @@ from plumed_grids import *
 g = Grid()
 
 #read in a PLUMED grid. In this example, it's assumed to be 2D
-g.read_plumed1_grid('BIAS')
+g.read_plumed_grid('BIAS')
 
 #Add a pretty sunset to the bias
 g.add_png_to_grid('sunset.png')
@@ -75,6 +75,16 @@ print g == g2
 
 ```
 
+Plumed 1 vs Plumed 2
+----
+
+When writing files, you must specify with either `write_plumed1_grid`
+or `write_plumed2_grid`. When reading, the generic `read_plumed_grid`
+will infer the file type.
+
+When writing Plumed 2 grids, you can optionally specify names by
+passing a list to the `write_plumed2_grid` method 
+
 Integrals
 ---
 
@@ -112,7 +122,7 @@ g.plot_2d_region('region2.png', region2)
 -np.log(g.integrate_region(region1)) + np.log(g.integrate_region(region2))
 ```
 
-PLUMED 1 vs PLUMED 2
+Convert Plumed 1 to Plumed 2
 ----
 
 Note that the derivatives will not be transferred!
@@ -120,7 +130,7 @@ Note that the derivatives will not be transferred!
 ```python
 g = Grid()
 g.read_plumed1_grid('some_grid.dat')
-g.write_plumed2_grid('some_grid2.dat')
+g.write_plumed2_grid('some_grid2.dat', names = ['foo', 'bar', 'metad.target'])
 ```
 
 
