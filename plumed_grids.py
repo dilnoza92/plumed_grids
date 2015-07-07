@@ -1,3 +1,9 @@
+#
+# plumed_grids.py
+#
+# Written by Andrew White
+# See LICENSE and README file included in repo
+#
 from math import ceil, floor, log, exp, pi, copysign
 import numpy as np
 from scipy.integrate import simps
