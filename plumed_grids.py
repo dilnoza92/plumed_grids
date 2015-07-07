@@ -176,16 +176,7 @@ class Grid(object):
         #switch to fortran syntax
         if(ncv > 1):
             grid_points[0], grid_points[1] = grid_points[1], grid_points[0]
-        self.pot = np.reshape(self.pot, grid_points)
-
-              
-        #switch to C-style syntax         
-        if(ncv > 1):
-            #reflect
-            self.pot = self.pot[::-1]
-
-            #rotate
-            self.pot = np.rot90(self.pot, 3)
+        self.pot = np.reshape(self.pot, grid_points, order='F')
 
     def read_plumed2_grid(self, filename):
         
@@ -295,19 +286,7 @@ class Grid(object):
         #switch to fortran syntax
         if(ncv > 1):
             grid_points[0], grid_points[1] = grid_points[1], grid_points[0]
-        self.pot = np.reshape(self.pot, grid_points)
-
-              
-        #switch to C-style syntax         
-        if(ncv > 1):
-            #reflect
-            self.pot = self.pot[::-1]
-
-            #rotate
-            self.pot = np.rot90(self.pot, 3)
-
-        
-  
+        self.pot = np.reshape(self.pot, grid_points, order='F')
 
     def __str__(self):
         return "{} dimension Grid object from {} to {} with {} grid points. Periodic = {}, Types = {}".format(self.dims, self.min, self.max, self.grid_points, self.periodic, self.types)
