@@ -606,7 +606,7 @@ class Grid(object):
             output.write('{: 10.8f} '.format(j * self.dx[i] + self.min[i]))        
         output.write('{: 10.8f}\n'.format(self.pot[tuple(indices)]))
 
-    def plot_2d(self, filename, cmap='jet', resolution=None, axis=(1,0), hold=False, vrange=None):
+    def plot_2d(self, filename, cmap='jet', resolution=None, axis=(0,1), hold=False, vrange=None):
         """This will make a 2D heatmap. The resolution keyword is the bin
         number on the grid. Set the axis being plotted with the axis
         keyword. Hold can be used if you want to add other elements to
@@ -665,7 +665,7 @@ class Grid(object):
         assert self.dims >= 2
         assert NDITER, "numpy nditer unavailable"
         cmap = 'jet'
-        axis=(1,0)
+        axis=(0,1)
         if(self.meshgrid is None):
             self.meshgrid = np.meshgrid(*[np.arange(min, max, dx) for min,max,dx in zip(self.min, self.max, self.dx)], indexing='ij')
 
@@ -743,12 +743,12 @@ class Grid(object):
             output = open(output, 'w')
         output.write('#! FORCE 0\n')
         output.write('#! NVAR {}\n'.format(self.ncv))
-        self.print_header_array('TYPE', self.types, output)
+        print_header_array('TYPE', self.types, output)
 
-        self.print_header_array('BIN', self.nbins, output)
-        self.print_header_array('MIN', self.min, output)
-        self.print_header_array('MAX', self.max, output)
-        self.print_header_array('PBC', [1 if x else 0 for x in self.periodic], output)
+        print_header_array('BIN', self.nbins, output)
+        print_header_array('MIN', self.min, output)
+        print_header_array('MAX', self.max, output)
+        print_header_array('PBC', [1 if x else 0 for x in self.periodic], output)
         self._enumerate_grid(lambda x: self._print_grid(x, output))
 
     def write_plumed2_grid(self, output, names=None):
