@@ -85,13 +85,15 @@ will infer the file type.
 When writing Plumed 2 grids, you can optionally specify names by
 passing a list to the `write_plumed2_grid` method 
 
-Integrals
+Integrals and Units
 ---
 
 It is always assumed that what is stored in the grid is -ln U, so that
 to integrate we take e^(-U) of the values stored and then return -log
 of that integral. So, if units are in energy in kT, we integrate the
-probability.
+probability. This is the format used for experiment directed
+metadynamics (EDM) as implemented in Plumed 2, Plumed 1, and the
+electronic dance music lammps plugin.
 
 
 Regions
