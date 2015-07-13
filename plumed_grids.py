@@ -170,7 +170,7 @@ class Grid(object):
         for i in range(len(grid_points)):
             if(not self.periodic[i]):
                 grid_points[i] += 1
-        
+
         #now load data
         data = np.genfromtxt(filename)        
         #check header
@@ -179,9 +179,7 @@ class Grid(object):
 
         #build the grid
         self.pot = data[:,ncv]
-        #switch to fortran syntax
-        if(ncv > 1):
-            grid_points[0], grid_points[1] = grid_points[1], grid_points[0]
+        #switch from fortran order
         self.pot = np.reshape(self.pot, grid_points, order='F')
 
     def read_plumed2_grid(self, filename):
@@ -289,9 +287,7 @@ class Grid(object):
 
         #build the grid
         self.pot = data[:,ncv]
-        #switch to fortran syntax
-        if(ncv > 1):
-            grid_points[0], grid_points[1] = grid_points[1], grid_points[0]
+        #switch from fortran order
         self.pot = np.reshape(self.pot, grid_points, order='F')
 
     def __str__(self):
@@ -318,10 +314,10 @@ class Grid(object):
     
     @property
     def grid_points(self):
-        if(self.pot is None):
-            return ()
         if(self._grid_points is not None):
             return self._grid_points
+        if(self.pot is None):
+            return ()
         return np.shape(self.pot)        
 
     @property
@@ -750,6 +746,7 @@ class Grid(object):
         print_header_array('MAX', self.max, output)
         print_header_array('PBC', [1 if x else 0 for x in self.periodic], output)
         self._enumerate_grid(lambda x: self._print_grid(x, output))
+
 
     def write_plumed2_grid(self, output, names=None):
         """
