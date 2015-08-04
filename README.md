@@ -88,8 +88,7 @@ passing a list to the `write_plumed2_grid` method
 Integrals and Units
 ---
 
-It is always assumed that what is stored in the grid is -ln U, so that
-to integrate we take e^(-U) of the values stored and then return -log
+It is always assumed that what is stored in the grid is -ln P(s) or F(s) / kT, where P(s) and F(s) are probability and free energy, respectively. To integrate we take e^(-V) of the values (V) stored and then return -log
 of that integral. So, if units are in energy in kT, we integrate the
 probability. This is the format used for experiment directed
 metadynamics (EDM) as implemented in Plumed 2, Plumed 1, and the
