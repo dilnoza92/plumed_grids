@@ -620,7 +620,7 @@ class Grid(object):
         else:
             data = self.pot
         if(resolution is not None):
-            self.set_bin_number([resolution if x in axis else self.nbins[x] for x in range(self.dims)])
+            self.set_grid_point_number([resolution if x in axis else self.nbins[x] for x in range(self.dims)])
         
         vmin = np.min(data)
         vmax = np.max(data)
@@ -807,7 +807,7 @@ class Grid(object):
         #gray_scale[np.where(gray_scale < too_small)] = too_small        
         #self.pot += np.log(gray_scale)
         old_bins = self.nbins
-        self.set_bin_number(np.shape(gray_scale))
+        self.set_grid_point_number(np.shape(gray_scale))
         self.pot += gray_scale
         self.normalize()
         self.set_bin_number(old_bins)
