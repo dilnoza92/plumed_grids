@@ -1,13 +1,17 @@
+from __future__ import absolute_import, division, print_function
+
 import unittest
 import sys
 import numpy as np
+import numpy.testing as npt 
 import textwrap
 
 sys.path.append('..')
 
-EPSILON = 0.000000001
 PLUMED_GRID=8
 PLUMED_GRID_SRC='grids'
+PLUMED2_GRID=1
+PLUMED2_GRID_SRC='grids2'
 
 from plumed_grids import *
 
@@ -36,13 +40,12 @@ class TestPlumedGrid(unittest.TestCase):
     def test_dx(self):
         g = Grid()
         g.add_cv('Coordination number', 0, 10, 10)
-        self.assertTrue(g.dx[0] - 1 < EPSILON)
+        npt.assert_approx_equal(g.dx[0],1)
 
         g = Grid()
         g.add_cv('Coordination number', 0, 10, 10, True)
-        self.assertTrue(g.dx[0] - 1 < EPSILON)
+        npt.assert_approx_equal(g.dx[0],1)
         
-
 
     def test_clone(self):
         g = Grid()
@@ -106,12 +109,12 @@ class TestPlumedGrid(unittest.TestCase):
         g = Grid()
         g.add_cv('Distance', 0, 10, 10)
         g.set_value([5], 5)
-        self.assertTrue(g.get_value([5]) - 5 < EPSILON)
+        npt.assert_approx_equal(g.get_value([5]),5)
 
         g = Grid()
         g.add_cv('Distance', 0, 10, 10, True)
         g.set_value([-1.1], 1)
-        self.assertTrue(g.get_value([8.9]) - 1 < EPSILON)
+        npt.assert_approx_equal(g.get_value([8.9]), 1)
 
 
         g = Grid()
@@ -120,7 +123,7 @@ class TestPlumedGrid(unittest.TestCase):
         g.add_cv('Distance', 0, 10, 10, True)
         g.add_cv('Distance', 0, 10, 10, False)
         g.set_value([10, -1, -3, 5], 1)
-        self.assertTrue(g.get_value([10, 9, 7, 5]) - 1 < EPSILON)
+        npt.assert_approx_equal(g.get_value([10, 9, 7, 5]),1)
 
 
     def test_set_bin_number(self):
@@ -129,7 +132,7 @@ class TestPlumedGrid(unittest.TestCase):
         g.set_value([0.5], 1)
         g.set_bin_number(100)
         self.assertEqual(np.shape(g.pot)[0], 101)
-        self.assertTrue(g.pot[0]-1 < EPSILON)
+        npt.assert_approx_equal(g.pot[0], 1)
         self.assertTrue(np.abs(g.pot[9]) < 0.2)
         
     def test_load_data(self):
@@ -148,10 +151,10 @@ class TestPlumedGrid(unittest.TestCase):
             2 1 9
             2 2 10'''))            
         g.load_data('test')
-        self.assertTrue(g.pot[0,0] - 1 < EPSILON)
-        self.assertTrue(g.pot[1,0] - 4 < EPSILON)
-        self.assertTrue(g.pot[1,1] - 5 < EPSILON)
-        self.assertTrue(g.get_value( [1.5,1.5] ) - 5 < EPSILON)
+        npt.assert_approx_equal(g.pot[0,0],1)
+        npt.assert_approx_equal(g.pot[1,0], 4)
+        npt.assert_approx_equal(g.pot[1,1], 5)
+        npt.assert_approx_equal(g.get_value( [1.5,1.5] ), 5)
 
     def test_load_data_periodic(self):
         with open('test', 'w') as f:
@@ -171,11 +174,12 @@ class TestPlumedGrid(unittest.TestCase):
         g.add_cv('Distance', 0, 2, 2, periodic=True)
         g.load_data('test')
 
-        self.assertTrue(g.pot[0,0] - 1 < EPSILON)
-        self.assertTrue(g.pot[1,0] - 4 < EPSILON)
-        self.assertTrue(g.get_value( [-1,-1] ) - 10 < EPSILON)
-        self.assertTrue(g.get_value( [2, 2] ) - 10 < EPSILON)
-        self.assertTrue(g.get_value( [3, 3] ) - 5 < EPSILON)
+        print(g.pot[1,0])
+        npt.assert_approx_equal(g.pot[0,0], 1)
+        npt.assert_approx_equal(g.pot[1,0], 4)
+        npt.assert_approx_equal(g.get_value( [-1,-1] ), 10)
+        npt.assert_approx_equal(g.get_value( [2, 2] ), 10)
+        npt.assert_approx_equal(g.get_value( [3, 3] ), 5)
 
 
 
@@ -196,7 +200,7 @@ class TestPlumedGrid(unittest.TestCase):
             2 2 0'''))            
         g.load_data('test')
         self.assertEqual(g.nbins , (1,1))
-        self.assertTrue(abs(g.pot[0,0] - 4) < EPSILON)        
+        npt.assert_approx_equal(abs(g.pot[0,0]), 4)
 
     def test_add(self):
         g = Grid()
@@ -209,10 +213,10 @@ class TestPlumedGrid(unittest.TestCase):
         
         g.add(h)
         
-        self.assertTrue(abs(g.get_value([5]) - 2) < EPSILON)
-        self.assertTrue(abs(g.get_value([7]) - 2) < EPSILON)
-        self.assertTrue(abs(g.get_value([8]) - 1) < EPSILON)
-        self.assertTrue(abs(g.get_value([10]) - 1) < EPSILON)
+        npt.assert_approx_equal(abs(g.get_value([5])), 2)
+        npt.assert_approx_equal(abs(g.get_value([7])), 2)
+        npt.assert_approx_equal(abs(g.get_value([8])), 1)
+        npt.assert_approx_equal(abs(g.get_value([10])), 1)
         
 
     def test_set_min_max(self):
@@ -252,7 +256,7 @@ class TestPlumedGrid(unittest.TestCase):
         self.assertEqual(g.min[1], 0)
         self.assertEqual(g.max[1], 10)
         self.assertEqual(g.nbins[0], 10)
-        self.assertTrue(abs(g.dx[0] - g.dx[1] ) < EPSILON)
+        self.assertTrue(abs(g.dx[0]), abs(g.dx[1]))
 
     def test_plumed_grid_consistency(self):
         for i in range(1, PLUMED_GRID+1):
@@ -264,9 +268,25 @@ class TestPlumedGrid(unittest.TestCase):
             h = Grid()
             h.read_plumed_grid(output)
             if(not h.__eq__(g)):
-                print h == g
-                print "Error on {}".format(output)
+                print(h == g)
+                print("Error on {}".format(output))
             self.assertEqual(h, g)
+
+    def test_plumed2_grid_consistency(self):
+        for i in range(1, PLUMED2_GRID+1):
+            input =  '{}/{}.dat'.format(PLUMED2_GRID_SRC, i)
+            output = '{}.test'.format(input)
+            g = Grid()
+            g.read_plumed_grid(input)
+            g.write_plumed2_grid(output)
+            h = Grid()
+            h.read_plumed_grid(output)
+            if(not h.__eq__(g)):
+                print(h == g)
+                print("Error on {}".format(output))
+            self.assertEqual(h, g)
+
+            
             
 if __name__ == '__main__':
     unittest.main()
