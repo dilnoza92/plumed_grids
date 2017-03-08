@@ -4,6 +4,9 @@
 # Written by Andrew White
 # See LICENSE and README file included in repo
 #
+
+from __future__ import absolute_import, division, print_function
+
 from math import ceil, floor, log, exp, pi, copysign
 import numpy as np
 from scipy.integrate import simps
@@ -112,7 +115,7 @@ class Grid(object):
         for x in data:
             indexs = self.np_to_index(x[:-1])
 
-            assert self.pot[tuple(indexs)] == x[-1] or self.pot[tuple(indexs)] == 0, "Error, value {} was set to 2 different values {} and {}, likely due to periodic bounddary wrapping".format(x[:-1], x[-1], self.pot[tuple(indexs)])
+            assert self.pot[tuple(indexs)] == x[-1] or self.pot[tuple(indexs)] == 0, "Error, value {} was set to 2 different values {} and {}, likely due to periodic boundary wrapping".format(x[:-1], x[-1], self.pot[tuple(indexs)])
 
             self.pot[tuple(indexs)] = x[-1]
         self.set_grid_point_number(old_grid_points)
@@ -226,7 +229,7 @@ class Grid(object):
                             assert toskip == 0, "Order of fields is unexpected"
                             self.names.append(item)
                     #pop the last name, which is the name of the variable being measured
-                    print 'Reading in variable called {}'.format(self.names.pop())
+                    print('Reading in variable called {}'.format(self.names.pop()))
                     #self.names.pop()
                     ncv = len(self.names)
                     toset = ncv * 4
@@ -265,16 +268,17 @@ class Grid(object):
                     toset -= 1
                     continue
                 
-                print 'WARNING: Did not know what do with this line:\n', line
+                print('WARNING: Did not know what do with this line:\n', line)
 
             if toset != 0:
                 raise IOError('Could not determine all attributes from header. {} Remained unset'.format(toset))
                                                         
         #convert to grid_points
         grid_points = bins
-        for i in range(len(grid_points)):
-            if(not self.periodic[i]):
-                grid_points[i] += 1
+        #maybe not necessary in plumed2 (?)
+        #for i in range(len(grid_points)):
+        #    if(not self.periodic[i]):
+        #        grid_points[i] += 1
         
         #now load data
         data = np.genfromtxt(filename)
@@ -282,7 +286,7 @@ class Grid(object):
         data = data[:,0:(ncv+1)]
 
         #check header
-        assert np.shape(data)[0] == reduce(lambda x,y: x * y, grid_points, 1), "Number of lines in grid does not match stated grid point number (calculated from NBINS): read {}, grid points = {} => {}".format(np.shape(data)[0], grid_points, reduce(lambda x,y: x * y, grid_points, 1))
+        assert np.shape(data)[0] == reduce(lambda x,y: x * y, grid_points, 1), "Warning: Number of lines in grid does not match stated grid point number (calculated from NBINS): read {}, grid points = {} => {}".format(np.shape(data)[0], grid_points, reduce(lambda x,y: x * y, grid_points, 1))
 
 
         #build the grid
@@ -391,7 +395,7 @@ class Grid(object):
             new_max = [round(x * 10) / 10. for x in new_max]
         self.set_min(new_min)
         self.set_max(new_max)
-        print 'Set min to {} and max to {}'.format(self.min, self.max) 
+        print('Set min to {} and max to {}'.format(self.min, self.max) )
 
         
             
@@ -425,7 +429,6 @@ class Grid(object):
         """
         assert len(scale) == self.ncv
         length_diff = [(y - x) * (s - 1) for x,y,s in zip(self.min, self.max, scale)]
-        print length_diff
         self.min = [x - l / 2 for x,l in zip(self.min, length_diff)]
         self.max = [x + l / 2 for x,l in zip(self.max, length_diff)]
 
@@ -449,7 +452,7 @@ class Grid(object):
         if(self.periodic[i]):
             x = self._wrap(x,i)
 
-        return max(0, min(self.grid_points[i] - 1, int(floor( (x - self.min[i]) / self.dx[i]))))
+        return int(max(0, min(self.grid_points[i] - 1, floor( (x - self.min[i]) / self.dx[i]))))
 
     def index_to_coord(self, index):
         return [self.min[i] + self.dx[i] * j for i,j in zip(range(self.ncv), index)]
@@ -457,7 +460,7 @@ class Grid(object):
 
     def np_to_index(self, x):
         if(sum(self.periodic) == 0):
-            return np.fmax(np.zeros(np.shape(x)), np.fmin(np.array(self.grid_points) - 1, np.floor( (x - np.array(self.min)) / np.array(self.dx))))
+            return np.fmax(np.zeros(np.shape(x)), np.fmin(np.array(self.grid_points) - 1, np.floor( (x - np.array(self.min)) / np.array(self.dx)))).astype(np.int)
         else:
             return tuple([self.to_index(x,i) for i,x in enumerate(x)])
 
